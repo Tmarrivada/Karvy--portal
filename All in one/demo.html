@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KarvyData Portal</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ========== RESET & BASE ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f0f2f5;
+      padding-top: 80px;
+    }
+
+    /* ========== LOGIN PAGE ========== */
+    .login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
+      padding: 1.5rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .login-page.hidden {
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      padding: 2.8rem 2.5rem;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.25);
+    }
+
+    .login-card h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1a2e3f;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-card p {
+      color: #4a5f73;
+      margin-bottom: 2rem;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #dbe4ed;
+      border-radius: 1.8rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .login-card input:focus {
+      border-color: #077924;
+      box-shadow: 0 0 0 4px rgba(7, 121, 36, 0.1);
+    }
+
+    .login-card .login-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: #077924;
+      color: white;
+      border: none;
+      border-radius: 1.8rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .login-card .login-btn:hover {
+      background: #065e1d;
+    }
+
+    /* ========== HEADER / NAVBAR ========== */
+    .navbar {
+      background-color: #077924;
+      display: flex;
+      align-items: center;
+      padding: 8px 20px;
+      flex-wrap: wrap;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      min-height: 70px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-right: 25px;
+    }
+
+    .logo img {
+      height: 45px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .navbar a, .dropdown-btn {
+      color: white;
+      padding: 10px 18px;
+      text-decoration: none;
+      font-size: 15px;
+      border-radius: 40px;
+      transition: 0.15s;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      display: block;
+    }
+
+    .navbar a:hover, .dropdown-btn:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .navbar a.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      font-weight: 600;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #077924;
+      min-width: 320px;
+      z-index: 1001;
+      border-radius: 12px;
+      padding: 8px 0;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+      top: 100%;
+      left: 0;
+      margin-top: 5px;
+    }
+
+    .dropdown:hover .dropdown-content,
+    .dropdown.active .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      border-radius: 0;
+      white-space: nowrap;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .logout-btn {
+      margin-left: auto;
+      background: rgba(255, 0, 0, 0.2) !important;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 0, 0, 0.4) !important;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .content-section {
+      display: none;
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== TABLE STYLES ========== */
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .table-header h2 {
+      color: #1a2e3f;
+      font-size: 1.5rem;
+    }
+
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-controls input[type="text"] {
+      padding: 8px 14px;
+      border: 1.5px solid #dbe4ed;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      width: 200px;
+    }
+
+    .table-controls input[type="text"]:focus {
+      border-color: #077924;
+    }
+
+    .table-controls select {
+      padding: 8px 14px;
+      border: 1.5px solid #dbe4ed;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: #077924;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #065e1d;
+    }
+
+    .btn-edit {
+      background: #ffc107;
+      color: #000;
+    }
+
+    .btn-edit:hover {
+      background: #e0a800;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #e8ecf0;
+      border-radius: 8px;
+    }
+
+    .table-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      table-layout: fixed;
+    }
+
+    .table-wrapper thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .table-wrapper thead th {
+      background: #077924;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .table-wrapper tbody td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e8ecf0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      max-width: 200px;
+    }
+
+    .table-wrapper tbody tr:hover {
+      background: #f5f8fa;
+    }
+
+    .table-wrapper tbody tr:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    /* Status colors */
+    .status-active {
+      background: #28a745;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-closed {
+      background: #dc3545;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-suspended {
+      background: #ffc107;
+      color: #000;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    /* ========== MODAL ========== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 20px;
+      color: #1a2e3f;
+    }
+
+    .modal-content .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-content .form-group {
+      margin-bottom: 12px;
+    }
+
+    .modal-content .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .modal-content .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 4px;
+      font-size: 13px;
+      color: #1a2e3f;
+    }
+
+    .modal-content .form-group input,
+    .modal-content .form-group select,
+    .modal-content .form-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.5px solid #dbe4ed;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    .modal-content .form-group input:focus,
+    .modal-content .form-group select:focus,
+    .modal-content .form-group textarea:focus {
+      border-color: #077924;
+      box-shadow: 0 0 0 3px rgba(7, 121, 36, 0.1);
+    }
+
+    .modal-content .form-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e8ecf0;
+    }
+
+    .modal-actions .btn {
+      padding: 10px 24px;
+    }
+
+    /* ========== CHANGE PASSWORD MODAL ========== */
+    .password-requirements {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .password-requirements li {
+      list-style: none;
+      padding: 4px 0;
+      font-size: 13px;
+      color: #495057;
+    }
+
+    .password-requirements li.valid {
+      color: #28a745;
+    }
+
+    .password-requirements li.invalid {
+      color: #dc3545;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px;
+        min-height: auto;
+      }
+
+      .logo {
+        margin-bottom: 8px;
+        justify-content: center;
+      }
+
+      .nav-links {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .dropdown-content {
+        position: static;
+        box-shadow: none;
+        border-radius: 8px;
+        margin-top: 4px;
+      }
+
+      .dropdown-content a {
+        white-space: normal;
+        padding-left: 30px;
+      }
+
+      .logout-btn {
+        margin-left: 0;
+        margin-top: 5px;
+      }
+
+      body {
+        padding-top: 0;
+      }
+
+      .table-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .table-controls input[type="text"] {
+        width: 100%;
+      }
+
+      .modal-content .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .modal-content {
+        padding: 20px;
+      }
+    }
+
+    /* Scrollbar styling */
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #077924;
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #065e1d;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== LOGIN PAGE ========== -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <h1>Welcome Back</h1>
+    <p>Sign in to access the portal</p>
+    <input type="email" id="loginEmail" placeholder="Email" value="demo@user.com">
+    <input type="password" id="loginPassword" placeholder="Password" value="password123">
+    <button class="login-btn" onclick="handleLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- ========== PORTAL ========== -->
+<div id="portal" style="display: none;">
+
+  <!-- HEADER -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="./Images/karvydata.png" alt="KarvyData" onerror="this.outerHTML='<span style=\'color:white;font-weight:700;font-size:1.2rem;\'>KarvyData</span>'">
+    </div>
+    <div class="nav-links">
+      <a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a>
+
+      <!-- Branches / Franchisees List -->
+      <div class="dropdown">
+        <button class="dropdown-btn"><i class="fas fa-sitemap"></i> Branches / Franchisees List ▼</button>
+        <div class="dropdown-content">
+          <a href="#" onclick="showSection('tinfc')">1. TINFC Active & Closed Branches/Franchisees</a>
+          <a href="#" onclick="showSection('panfc')">2. PANFC Active & Closed Branches/Franchisees</a>
+          <a href="#" onclick="showSection('subusers')">3. Sub User IDs</a>
+          <a href="#" onclick="showSection('conversions')">4. Branch to Franchise Conversions</a>
+        </div>
+      </div>
+
+      <!-- Details Update -->
+      <div class="dropdown">
+        <button class="dropdown-btn"><i class="fas fa-edit"></i> Details Update ▼</button>
+        <div class="dropdown-content">
+          <a href="#" onclick="showSection('dsc-mapping')">1. TINFC DSC Mapping Details</a>
+          <a href="#" onclick="showSection('ho-dsc')">2. HO DSC Mapping Details</a>
+          <a href="#" onclick="showSection('change-request')">3. Change Request Details</a>
+          <a href="#" onclick="showSection('user-active')">4. User IDs Active / Deactive</a>
+          <a href="#" onclick="showSection('delete-data')">5. Delete Data</a>
+        </div>
+      </div>
+
+      <a href="#" onclick="openChangePassword()"><i class="fas fa-key"></i> Change Password</a>
+      <a href="#" class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-container">
+
+    <!-- DASHBOARD -->
+    <div class="content-section active" id="section-dashboard">
+      <h2 style="margin-bottom:20px;color:#1a2e3f;">📊 Dashboard Overview</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;">
+        <div style="background:#f8fafc;padding:16px 20px;border-radius:12px;border-left:4px solid #077924;">
+          <label style="font-size:12px;color:#6b7a8a;text-transform:uppercase;">Total Branches</label>
+          <div style="font-size:24px;font-weight:700;color:#1a2e3f;" id="dashTotalBranches">0</div>
+        </div>
+        <div style="background:#f8fafc;padding:16px 20px;border-radius:12px;border-left:4px solid #077924;">
+          <label style="font-size:12px;color:#6b7a8a;text-transform:uppercase;">Total Franchises</label>
+          <div style="font-size:24px;font-weight:700;color:#1a2e3f;" id="dashTotalFranchises">0</div>
+        </div>
+        <div style="background:#f8fafc;padding:16px 20px;border-radius:12px;border-left:4px solid #28a745;">
+          <label style="font-size:12px;color:#6b7a8a;text-transform:uppercase;">Active</label>
+          <div style="font-size:24px;font-weight:700;color:#28a745;" id="dashActive">0</div>
+        </div>
+        <div style="background:#f8fafc;padding:16px 20px;border-radius:12px;border-left:4px solid #dc3545;">
+          <label style="font-size:12px;color:#6b7a8a;text-transform:uppercase;">Closed</label>
+          <div style="font-size:24px;font-weight:700;color:#dc3545;" id="dashClosed">0</div>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Branch Type</th><th>TINFC</th><th>PANFC</th><th>Total</th></tr>
+          </thead>
+          <tbody id="dashTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TINFC Section -->
+    <div class="content-section" id="section-tinfc">
+      <div class="table-header">
+        <h2>🏢 TINFC Active & Closed Branches/Franchisees</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('tinfcTable', this.value)">
+          <select onchange="filterByStatus('tinfcTable', this.value)">
+            <option value="all">All</option>
+            <option value="Active">Active</option>
+            <option value="Closed">Closed</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('tinfc')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="tinfcTable">
+          <thead>
+            <tr>
+              <th style="width:50px;">S No</th><th style="width:100px;">Branch code</th><th style="width:80px;">ZONE</th>
+              <th style="width:100px;">STATE</th><th style="width:100px;">DIST</th><th style="width:100px;">REGION</th>
+              <th style="width:120px;">LOCATION</th><th style="width:100px;">STATUS</th><th style="width:100px;">PAN</th>
+              <th style="width:80px;">LOC2</th><th style="width:80px;">CAD</th>
+              <th style="width:150px;">PAAM LOGIN ID DATE</th><th style="width:80px;">DSC</th><th style="width:80px;">SYSTEM</th>
+              <th style="width:120px;">PERSON</th><th style="width:200px;">ADDRESS</th><th style="width:100px;">PINCODE</th>
+              <th style="width:80px;">STD</th><th style="width:120px;">TELEPHONE</th>
+              <th style="width:180px;">TIN OFFICIAL MOBILE</th><th style="width:180px;">NSDL OTP Mobile</th>
+              <th style="width:180px;">New Mail</th><th style="width:180px;">Gmail</th><th style="width:120px;">BR_TYPE</th>
+              <th style="width:180px;">Certificate Name</th><th style="width:180px;">Conversion Dates</th>
+              <th style="width:180px;">Certificate Valid</th><th style="width:80px;">FR_SRNO</th><th style="width:80px;">FD_WITH_US</th>
+              <th style="width:120px;">Training Date</th><th style="width:150px;">Training Master</th>
+              <th style="width:150px;">REMARK</th><th style="width:150px;">OTHERS</th>
+              <th style="width:80px;">NO_TIN_SYS</th><th style="width:80px;">Cancel Mach</th>
+              <th style="width:100px;">Cancel Mach Id</th><th style="width:100px;">Branch Closed</th>
+              <th style="width:150px;">Backup Received</th><th style="width:120px;">Pending Issue</th>
+              <th style="width:180px;">Closure Request</th><th style="width:180px;">Withdrawel Form</th>
+              <th style="width:180px;">Closed Letter</th><th style="width:120px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tinfcBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANFC Section -->
+    <div class="content-section" id="section-panfc">
+      <div class="table-header">
+        <h2>🏢 PANFC Active & Closed Branches/Franchisees</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('panfcTable', this.value)">
+          <select onchange="filterByStatus('panfcTable', this.value)">
+            <option value="all">All</option>
+            <option value="Active">Active</option>
+            <option value="Closed">Closed</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('panfc')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="panfcTable">
+          <thead>
+            <tr>
+              <th style="width:50px;">S No</th><th style="width:100px;">Branch code</th><th style="width:80px;">ZONE</th>
+              <th style="width:100px;">STATE</th><th style="width:100px;">DIST</th><th style="width:100px;">REGION</th>
+              <th style="width:120px;">LOCATION</th><th style="width:100px;">STATUS</th><th style="width:100px;">PAN</th>
+              <th style="width:80px;">LOC2</th><th style="width:80px;">CAD</th>
+              <th style="width:150px;">PAAM LOGIN ID DATE</th><th style="width:80px;">DSC</th><th style="width:80px;">SYSTEM</th>
+              <th style="width:120px;">PERSON</th><th style="width:200px;">ADDRESS</th><th style="width:100px;">PINCODE</th>
+              <th style="width:80px;">STD</th><th style="width:120px;">TELEPHONE</th>
+              <th style="width:180px;">TIN OFFICIAL MOBILE</th><th style="width:180px;">NSDL OTP Mobile</th>
+              <th style="width:180px;">New Mail</th><th style="width:180px;">Gmail</th><th style="width:120px;">BR_TYPE</th>
+              <th style="width:180px;">Certificate Name</th><th style="width:180px;">Conversion Dates</th>
+              <th style="width:180px;">Certificate Valid</th><th style="width:80px;">FR_SRNO</th><th style="width:80px;">FD_WITH_US</th>
+              <th style="width:120px;">Training Date</th><th style="width:150px;">Training Master</th>
+              <th style="width:150px;">REMARK</th><th style="width:150px;">OTHERS</th>
+              <th style="width:80px;">NO_TIN_SYS</th><th style="width:80px;">Cancel Mach</th>
+              <th style="width:100px;">Cancel Mach Id</th><th style="width:100px;">Branch Closed</th>
+              <th style="width:150px;">Backup Received</th><th style="width:120px;">Pending Issue</th>
+              <th style="width:180px;">Closure Request</th><th style="width:180px;">Withdrawel Form</th>
+              <th style="width:180px;">Closed Letter</th><th style="width:120px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="panfcBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sub User IDs -->
+    <div class="content-section" id="section-subusers">
+      <div class="table-header">
+        <h2>👤 Sub User IDs</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('subuserTable', this.value)">
+          <button class="btn btn-primary" onclick="openModal('subuser')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="subuserTable">
+          <thead>
+            <tr>
+              <th>S no</th><th>Creation Date</th><th>Under Br code</th><th>Location</th>
+              <th>Authorization</th><th>Sub User id</th><th>User Name</th>
+              <th>Location</th><th>Address</th>
+              <th>Contact No</th><th>Personal Email id</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="subuserBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Branch to Franchise Conversions -->
+    <div class="content-section" id="section-conversions">
+      <div class="table-header">
+        <h2>🔄 Branch to Franchise Conversions</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('conversionTable', this.value)">
+          <select onchange="filterByStatus('conversionTable', this.value)">
+            <option value="all">All</option>
+            <option value="Active">Active</option>
+            <option value="Closed">Closed</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('conversion')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="conversionTable">
+          <thead>
+            <tr>
+              <th>Branch code</th><th>Location</th><th>Status</th><th>current person name</th>
+              <th>Previous person Name</th><th>Refarence name</th><th>Documents status</th>
+              <th>Status</th><th>Remarks</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="conversionBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TINFC DSC Mapping Details -->
+    <div class="content-section" id="section-dsc-mapping">
+      <div class="table-header">
+        <h2>🔐 TINFC DSC Mapping Details</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('dscTable', this.value)">
+          <button class="btn btn-primary" onclick="openModal('dsc')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="dscTable">
+          <thead>
+            <tr>
+              <th>S No</th><th>Application Mode</th><th>BRANCH code</th><th>Location</th>
+              <th>User Id</th><th>APPLICATION NO / Order No</th><th>Desired Username (Pan No)</th>
+              <th>Desired PIN (Paam User id 6digit)</th><th>Aadhaar No</th><th>Challenge Code</th>
+              <th>PASSWORD (DOB)</th><th>Serial No</th><th>SUBMISSION TO RO</th><th>ApplicantNAME</th>
+              <th>OLD DSC EXPIRY DATE</th><th>NEW DSC EXPIRY DATE</th><th>EMAIL ID</th>
+              <th>COURIER DETAILS (USB drives)</th><th>CONFIRMATION</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dscBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HO DSC Mapping Details -->
+    <div class="content-section" id="section-ho-dsc">
+      <div class="table-header">
+        <h2>🔐 HO DSC Mapping Details</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('hoDscTable', this.value)">
+          <button class="btn btn-primary" onclick="openModal('hodsc')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="hoDscTable">
+          <thead>
+            <tr>
+              <th>SNo</th><th>STATUS</th><th>CODE</th><th>Location</th><th>USER IDS</th>
+              <th>APPLICATION NO</th><th>Challenge Code</th><th>PASSWORD (DOB)</th>
+              <th>Serial No</th><th>KYC PAN no & Password (Ph lsdt 6digit)</th>
+              <th>SUBMISSION TO RO</th><th>Applicant NAME</th><th>OLD DSC EXPIRY DATE</th>
+              <th>NEW DSC EXPIRY DATE</th><th>EMAIL ID</th><th>CONFIRMATION</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="hoDscBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Change Request Details -->
+    <div class="content-section" id="section-change-request">
+      <div class="table-header">
+        <h2>📝 Change Request Details</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('changeRequestTable', this.value)">
+          <button class="btn btn-primary" onclick="openModal('changerequest')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="changeRequestTable">
+          <thead>
+            <tr>
+              <th>S no</th><th>Letter no</th><th>Mail sent to NSDL date</th><th>NSDL confirmation date</th>
+              <th>Modification details</th><th>Branch code</th><th>LOCATION</th><th>STATE</th>
+              <th>DIST</th><th>Old Name</th><th>New name</th><th>Old Address</th>
+              <th>New ADDRESS</th><th>Old Pincode</th><th>New PINCODE</th>
+              <th>Old contact number</th><th>New contact number</th><th>Old email id</th>
+              <th>New email id</th><th>BR_TYPE</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="changeRequestBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- User IDs Active / Deactive -->
+    <div class="content-section" id="section-user-active">
+      <div class="table-header">
+        <h2>🔄 User IDs Active / Deactive</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search..." oninput="filterTable('userActiveTable', this.value)">
+          <button class="btn btn-primary" onclick="openModal('useractive')"><i class="fas fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="userActiveTable">
+          <thead>
+            <tr>
+              <th>Sl.No</th><th>Branch Code</th><th>Status</th><th>Deactivate Date</th>
+              <th>Name of Confirmation</th><th>Deactivation Reason</th><th>Activation date</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userActiveBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Delete Data -->
+    <div class="content-section" id="section-delete-data">
+      <div class="table-header">
+        <h2>🗑️ Delete Data</h2>
+        <div class="table-controls">
+          <input type="text" placeholder="Search across all data..." oninput="filterDeleteData(this.value)">
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="deleteDataTable">
+          <thead>
+            <tr>
+              <th>Source</th><th>Branch code</th><th>Name</th><th>Location</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="branch-123"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== MODAL ========== -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Add New Record</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="saveRecord()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CHANGE PASSWORD MODAL ========== -->
+<div class="modal" id="changePasswordModal">
+  <div class="modal-content">
+    <h3><i class="fas fa-key"></i> Change Password</h3>
+    <div style="margin-bottom:15px;">
+      <div class="form-group">
+        <label>Current Password</label>
+        <input type="password" id="currentPassword" placeholder="Enter current password">
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="newPassword" placeholder="Enter new password" oninput="validatePassword()">
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm new password" oninput="validatePassword()">
+      </div>
+      <div class="password-requirements" id="passwordRequirements">
+        <li id="reqLength" class="invalid"><i class="fas fa-times"></i> At least 8 characters</li>
+        <li id="reqUppercase" class="invalid"><i class="fas fa-times"></i> At least one uppercase letter</li>
+        <li id="reqLowercase" class="invalid"><i class="fas fa-times"></i> At least one lowercase letter</li>
+        <li id="reqNumber" class="invalid"><i class="fas fa-times"></i> At least one number</li>
+        <li id="reqMatch" class="invalid"><i class="fas fa-times"></i> Passwords match</li>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeChangePassword()">Cancel</button>
+      <button class="btn btn-success" onclick="changePassword()" id="changePasswordBtn">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== DATA STORE ==========
+const appData = {
+  tinfc: [],
+  panfc: [],
+  subuser: [],
+  conversion: [],
+  dsc: [],
+  hodsc: [],
+  changerequest: [],
+  useractive: [],
+  counters: {
+    tinfc: 0,
+    panfc: 0,
+    subuser: 0,
+    conversion: 0,
+    dsc: 0,
+    hodsc: 0,
+    changerequest: 0,
+    useractive: 0
+  }
+};
+
+// ========== INITIAL SAMPLE DATA ==========
+function initSampleData() {
+  // TINFC Sample Data
+  for (let i = 1; i <= 8; i++) {
+    const statuses = ['Active', 'Active', 'Closed', 'Closed', 'Suspended', 'Active', 'Closed', 'Active'];
+    const brTypes = ['Branch', 'Franchisee', 'Branch', 'Franchisee', 'Branch', 'Franchisee', 'Branch', 'Franchisee'];
+    appData.tinfc.push({
+      id: i,
+      sno: i,
+      branch_code: `BR00${i}`,
+      zone: `Zone ${String.fromCharCode(64 + i)}`,
+      state: `State ${i}`,
+      dist: `Dist ${i}`,
+      region: `Region ${i}`,
+      location: `Location ${i}`,
+      status: statuses[i-1] || 'Active',
+      pan: `PAN${i}2345`,
+      loc2: `Loc2 ${i}`,
+      cad: `CAD${i}`,
+      paam_login_date: `2024-01-${String(i).padStart(2,'0')}`,
+      dsc: `DSC${i}`,
+      system: `Sys${i}`,
+      person: `Person ${i}`,
+      address: `${i} Main Street, Area Name, City, State`,
+      pincode: `${10000 + i}`,
+      std: `0${i}${i}`,
+      telephone: `98765${String(i).padStart(4,'0')}`,
+      mobile: `98765432${String(i).padStart(2,'0')}`,
+      nsdl_otp: `98765432${String(i+10).padStart(2,'0')}`,
+      new_mail: `branch${i}@karvy.com`,
+      gmail: `branch${i}@gmail.com`,
+      br_type: brTypes[i-1] || 'Branch',
+      cert_name: `Cert ${i}`,
+      conversion_dates: `2024-01-${String(i+10).padStart(2,'0')}`,
+      cert_valid: `2025-01-${String(i).padStart(2,'0')}`,
+      fr_srno: `FR${i}`,
+      fd_with_us: `FD${i}`,
+      training_date: `2024-02-${String(i).padStart(2,'0')}`,
+      training_master: `Master ${i}`,
+      remark: `Remark ${i}`,
+      others: `Other ${i}`,
+      no_tin_sys: `${i}`,
+      no_cancel_mach: `${i*2}`,
+      cancel_mach_id: `CM${i}`,
+      branch_closed: i % 2 === 0 ? 'Yes' : 'No',
+      backup_received: i % 3 === 0 ? 'Yes' : 'No',
+      pending_issue: i % 4 === 0 ? 'Yes' : 'No',
+      closure_request: i % 5 === 0 ? 'Yes' : 'No',
+      withdrawel_form: i % 6 === 0 ? 'Yes' : 'No',
+      closed_letter: i % 7 === 0 ? 'Yes' : 'No'
+    });
+    appData.counters.tinfc = i;
+  }
+
+  // PANFC Sample Data
+  for (let i = 1; i <= 6; i++) {
+    const statuses = ['Active', 'Closed', 'Active', 'Suspended', 'Active', 'Closed'];
+    const brTypes = ['Branch', 'Franchisee', 'Branch', 'Franchisee', 'Branch', 'Franchisee'];
+    appData.panfc.push({
+      id: i,
+      sno: i,
+      branch_code: `PB00${i}`,
+      zone: `PZone ${String.fromCharCode(64 + i)}`,
+      state: `PState ${i}`,
+      dist: `PDist ${i}`,
+      region: `PRegion ${i}`,
+      location: `PLocation ${i}`,
+      status: statuses[i-1] || 'Active',
+      pan: `PANP${i}2345`,
+      loc2: `PLoc2 ${i}`,
+      cad: `PCAD${i}`,
+      paam_login_date: `2024-01-${String(i+5).padStart(2,'0')}`,
+      dsc: `PDSC${i}`,
+      system: `PSys${i}`,
+      person: `PPerson ${i}`,
+      address: `${i} P Main Street, Area, City, State`,
+      pincode: `${20000 + i}`,
+      std: `0${i+1}${i}`,
+      telephone: `98765${String(i+10).padStart(4,'0')}`,
+      mobile: `98765432${String(i+20).padStart(2,'0')}`,
+      nsdl_otp: `98765432${String(i+30).padStart(2,'0')}`,
+      new_mail: `pbranch${i}@karvy.com`,
+      gmail: `pbranch${i}@gmail.com`,
+      br_type: brTypes[i-1] || 'Branch',
+      cert_name: `PCert ${i}`,
+      conversion_dates: `2024-01-${String(i+15).padStart(2,'0')}`,
+      cert_valid: `2025-01-${String(i+5).padStart(2,'0')}`,
+      fr_srno: `PFR${i}`,
+      fd_with_us: `PFD${i}`,
+      training_date: `2024-02-${String(i+5).padStart(2,'0')}`,
+      training_master: `PMaster ${i}`,
+      remark: `PRemark ${i}`,
+      others: `POther ${i}`,
+      no_tin_sys: `${i+5}`,
+      no_cancel_mach: `${i*3}`,
+      cancel_mach_id: `PCM${i}`,
+      branch_closed: i % 2 === 0 ? 'Yes' : 'No',
+      backup_received: i % 3 === 0 ? 'Yes' : 'No',
+      pending_issue: i % 4 === 0 ? 'Yes' : 'No',
+      closure_request: i % 5 === 0 ? 'Yes' : 'No',
+      withdrawel_form: i % 6 === 0 ? 'Yes' : 'No',
+      closed_letter: i % 7 === 0 ? 'Yes' : 'No'
+    });
+    appData.counters.panfc = i;
+  }
+
+  // Sub User IDs Sample Data
+  const subUsers = [
+    { creation_date: '2024-01-01', under_br: 'BR001', location: 'Mumbai', auth_coord: 'John Doe', sub_user_id: 'SUB001', user_name: 'Raj Kumar', user_location: 'Mumbai', address: '123, Andheri, Mumbai - 400001', contact: '9876543210', email: 'raj@karvy.com' },
+    { creation_date: '2024-01-15', under_br: 'BR002', location: 'Delhi', auth_coord: 'Jane Smith', sub_user_id: 'SUB002', user_name: 'Priya Sharma', user_location: 'Delhi', address: '456, Connaught Place, Delhi - 110001', contact: '9876543211', email: 'priya@karvy.com' },
+    { creation_date: '2024-02-01', under_br: 'BR003', location: 'Bangalore', auth_coord: 'Mike Johnson', sub_user_id: 'SUB003', user_name: 'Amit Patel', user_location: 'Bangalore', address: '789, MG Road, Bangalore - 560001', contact: '9876543212', email: 'amit@karvy.com' }
+  ];
+  subUsers.forEach((item, i) => {
+    appData.subuser.push({ id: i+1, sno: i+1, ...item });
+    appData.counters.subuser = i+1;
+  });
+
+  // Branch to Franchise Conversions Sample Data
+  const conversions = [
+    { branch_code: 'BR001', location: 'Mumbai', status: 'Active', current_person: 'Rajesh Singh', prev_person: 'Amit Verma', ref_name: 'Referral A', doc_status: 'Completed', status2: 'Approved', remarks: 'Conversion completed' },
+    { branch_code: 'BR002', location: 'Delhi', status: 'Closed', current_person: 'Sneha Reddy', prev_person: 'Vikram Shah', ref_name: 'Referral B', doc_status: 'Pending', status2: 'Under Review', remarks: 'Documents pending' },
+    { branch_code: 'BR003', location: 'Bangalore', status: 'Suspended', current_person: 'Kiran Kumar', prev_person: 'Deepak Gupta', ref_name: 'Referral C', doc_status: 'Completed', status2: 'Suspended', remarks: 'Suspended due to compliance' }
+  ];
+  conversions.forEach((item, i) => {
+    appData.conversion.push({ id: i+1, ...item });
+    appData.counters.conversion = i+1;
+  });
+
+  // DSC Mapping Sample Data
+  for (let i = 1; i <= 4; i++) {
+    appData.dsc.push({
+      id: i,
+      sno: i,
+      app_mode: `Mode ${i}`,
+      branch_code: `DSC${i}00`,
+      location: `DSC Location ${i}`,
+      user_id: `dsc_user${i}`,
+      app_no: `APP${i}2345`,
+      desired_username: `PAN${i}5678`,
+      desired_pin: `${String(i).padStart(6,'0')}`,
+      aadhaar: `${String(i).padStart(12,'0')}`,
+      challenge_code: `CH${i}${i}${i}`,
+      password: `DOB${i}${i}`,
+      serial_no: `SR${i}${i}${i}`,
+      submission_ro: `RO${i}`,
+      applicant_name: `Applicant ${i}`,
+      old_dsc_expiry: `2024-12-${String(i+10).padStart(2,'0')}`,
+      new_dsc_expiry: `2025-12-${String(i+10).padStart(2,'0')}`,
+      email: `dsc${i}@karvy.com`,
+      courier_details: `Courier ${i}`,
+      confirmation: i % 2 === 0 ? 'Confirmed' : 'Pending'
+    });
+    appData.counters.dsc = i;
+  }
+
+  // HO DSC Sample Data
+  for (let i = 1; i <= 3; i++) {
+    appData.hodsc.push({
+      id: i,
+      sno: i,
+      status: i % 2 === 0 ? 'Active' : 'Pending',
+      code: `HO${i}00`,
+      location: `HO Location ${i}`,
+      user_ids: `ho_user${i}`,
+      app_no: `HOAPP${i}2345`,
+      challenge_code: `HOCH${i}${i}`,
+      password: `HODOB${i}${i}`,
+      serial_no: `HOSR${i}${i}`,
+      kyc_pan: `KYC${i}${i}${i}`,
+      submission_ro: `HORO${i}`,
+      applicant_name: `HO Applicant ${i}`,
+      old_dsc_expiry: `2024-11-${String(i+10).padStart(2,'0')}`,
+      new_dsc_expiry: `2025-11-${String(i+10).padStart(2,'0')}`,
+      email: `ho${i}@karvy.com`,
+      confirmation: i % 2 === 0 ? 'Confirmed' : 'Pending'
+    });
+    appData.counters.hodsc = i;
+  }
+
+  // Change Request Sample Data
+  for (let i = 1; i <= 3; i++) {
+    appData.changerequest.push({
+      id: i,
+      sno: i,
+      letter_no: `LTR${i}${i}${i}`,
+      mail_date: `2024-01-${String(i+10).padStart(2,'0')}`,
+      nsdl_date: `2024-01-${String(i+15).padStart(2,'0')}`,
+      mod_details: `Modification ${i}`,
+      branch_code: `CR${i}00`,
+      location: `CR Location ${i}`,
+      state: `CR State ${i}`,
+      dist: `CR Dist ${i}`,
+      old_name: `Old Name ${i}`,
+      new_name: `New Name ${i}`,
+      old_address: `Old Address ${i}`,
+      new_address: `New Address ${i}`,
+      old_pincode: `${10000 + i}`,
+      new_pincode: `${20000 + i}`,
+      old_contact: `98765${String(i+10).padStart(4,'0')}`,
+      new_contact: `98765${String(i+20).padStart(4,'0')}`,
+      old_email: `old${i}@karvy.com`,
+      new_email: `new${i}@karvy.com`,
+      br_type: `CR Type ${i}`
+    });
+    appData.counters.changerequest = i;
+  }
+
+  // User Active/Deactive Sample Data
+  for (let i = 1; i <= 4; i++) {
+    const statuses = ['Active', 'Deactive', 'Active', 'Deactive'];
+    appData.useractive.push({
+      id: i,
+      sno: i,
+      branch_code: `UA${i}00`,
+      status: statuses[i-1] || 'Active',
+      deactivate_date: i % 2 === 0 ? `2024-01-${String(i+10).padStart(2,'0')}` : '',
+      confirmation: `Confirmation ${i}`,
+      deactivation_reason: i % 2 === 0 ? `Reason ${i}` : '',
+      activation_date: i % 2 !== 0 ? `2024-01-${String(i+5).padStart(2,'0')}` : ''
+    });
+    appData.counters.useractive = i;
+  }
+}
+
+// ========== RENDER FUNCTIONS ==========
+function renderTable(tableId, data, columns, statusColumn) {
+  const tbody = document.getElementById(tableId + 'Body');
+  if (!tbody) return;
+  
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="100" style="text-align:center;padding:30px;color:#6b7a8a;">No records found</td></tr>';
+    return;
+  }
+
+  let html = '';
+  data.forEach((row, index) => {
+    html += '<tr>';
+    columns.forEach(col => {
+      let value = row[col] || '-';
+      // Check if this is a status column for styling
+      if (col === 'status' || col === 'status2' || col === 'Status') {
+        if (value.toLowerCase() === 'active') {
+          html += `<td><span class="status-active">${value}</span></td>`;
+          return;
+        } else if (value.toLowerCase() === 'closed') {
+          html += `<td><span class="status-closed">${value}</span></td>`;
+          return;
+        } else if (value.toLowerCase() === 'suspended') {
+          html += `<td><span class="status-suspended">${value}</span></td>`;
+          return;
+        }
+      }
+      html += `<td>${value}</td>`;
+    });
+    // Actions - only edit button (no delete)
+    html += `<td>
+      <button class="btn btn-edit" onclick="editRecord('${tableId}', ${row.id})" style="padding:4px 10px;font-size:12px;margin-right:4px;"><i class="fas fa-edit"></i></button>
+    </td>`;
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function renderAllTables() {
+  // TINFC - ALL 42 FIELDS
+  renderTable('tinfc', appData.tinfc, 
+    ['sno','branch_code','zone','state','dist','region','location','status','pan','loc2','cad',
+     'paam_login_date','dsc','system','person','address','pincode','std','telephone','mobile',
+     'nsdl_otp','new_mail','gmail','br_type','cert_name','conversion_dates','cert_valid',
+     'fr_srno','fd_with_us','training_date','training_master','remark','others','no_tin_sys',
+     'no_cancel_mach','cancel_mach_id','branch_closed','backup_received','pending_issue',
+     'closure_request','withdrawel_form','closed_letter'], 'status');
+
+  // PANFC - ALL 42 FIELDS
+  renderTable('panfc', appData.panfc,
+    ['sno','branch_code','zone','state','dist','region','location','status','pan','loc2','cad',
+     'paam_login_date','dsc','system','person','address','pincode','std','telephone','mobile',
+     'nsdl_otp','new_mail','gmail','br_type','cert_name','conversion_dates','cert_valid',
+     'fr_srno','fd_with_us','training_date','training_master','remark','others','no_tin_sys',
+     'no_cancel_mach','cancel_mach_id','branch_closed','backup_received','pending_issue',
+     'closure_request','withdrawel_form','closed_letter'], 'status');
+
+  // Sub Users
+  renderTable('subuser', appData.subuser,
+    ['sno','creation_date','under_br','location','auth_coord','sub_user_id','user_name',
+     'user_location','address','contact','email'], null);
+
+  // Conversions
+  renderTable('conversion', appData.conversion,
+    ['branch_code','location','status','current_person','prev_person','ref_name',
+     'doc_status','status2','remarks'], 'status');
+
+  // DSC Mapping
+  renderTable('dsc', appData.dsc,
+    ['sno','app_mode','branch_code','location','user_id','app_no','desired_username',
+     'desired_pin','aadhaar','challenge_code','password','serial_no','submission_ro',
+     'applicant_name','old_dsc_expiry','new_dsc_expiry','email','courier_details','confirmation'], null);
+
+  // HO DSC
+  renderTable('hoDsc', appData.hodsc,
+    ['sno','status','code','location','user_ids','app_no','challenge_code','password',
+     'serial_no','kyc_pan','submission_ro','applicant_name','old_dsc_expiry','new_dsc_expiry',
+     'email','confirmation'], 'status');
+
+  // Change Request
+  renderTable('changeRequest', appData.changerequest,
+    ['sno','letter_no','mail_date','nsdl_date','mod_details','branch_code','location',
+     'state','dist','old_name','new_name','old_address','new_address','old_pincode',
+     'new_pincode','old_contact','new_contact','old_email','new_email','br_type'], null);
+
+  // User Active
+  renderTable('userActive', appData.useractive,
+    ['sno','branch_code','status','deactivate_date','confirmation','deactivation_reason',
+     'activation_date'], 'status');
+
+  // Update Dashboard
+  updateDashboard();
+  updateDeleteData();
+}
+
+// ========== DASHBOARD ==========
+function updateDashboard() {
+  const allData = [...appData.tinfc, ...appData.panfc];
+  const totalBranches = allData.length;
+  const totalFranchises = appData.conversion.length;
+  const active = allData.filter(d => d.status === 'Active').length + appData.conversion.filter(d => d.status === 'Active').length;
+  const closed = allData.filter(d => d.status === 'Closed').length + appData.conversion.filter(d => d.status === 'Closed').length;
+
+  document.getElementById('dashTotalBranches').textContent = totalBranches;
+  document.getElementById('dashTotalFranchises').textContent = totalFranchises;
+  document.getElementById('dashActive').textContent = active;
+  document.getElementById('dashClosed').textContent = closed;
+
+  // Dashboard table
+  const branchTypes = ['Active Branches', 'Active Franchises', 'Closed Branches', 'Closed Franchises', 
+                       'Suspended Branches', 'Suspended Franchises', 'Declaration pending Branches', 'Declaration pending Franchises'];
+  let html = '';
+  let tinfcTotal = 0, panfcTotal = 0;
+  
+  branchTypes.forEach(type => {
+    const isBranch = type.includes('Branches');
+    const isActive = type.includes('Active');
+    const isClosed = type.includes('Closed');
+    const isSuspended = type.includes('Suspended');
+    const isPending = type.includes('Declaration pending');
+    
+    let tinfc = 0, panfc = 0;
+    
+    if (isActive && isBranch) {
+      tinfc = appData.tinfc.filter(d => d.status === 'Active').length;
+      panfc = appData.panfc.filter(d => d.status === 'Active').length;
+    } else if (isActive && !isBranch) {
+      tinfc = appData.conversion.filter(d => d.status === 'Active').length;
+      panfc = 0;
+    } else if (isClosed && isBranch) {
+      tinfc = appData.tinfc.filter(d => d.status === 'Closed').length;
+      panfc = appData.panfc.filter(d => d.status === 'Closed').length;
+    } else if (isClosed && !isBranch) {
+      tinfc = appData.conversion.filter(d => d.status === 'Closed').length;
+      panfc = 0;
+    } else if (isSuspended && isBranch) {
+      tinfc = appData.tinfc.filter(d => d.status === 'Suspended').length;
+      panfc = appData.panfc.filter(d => d.status === 'Suspended').length;
+    } else if (isSuspended && !isBranch) {
+      tinfc = appData.conversion.filter(d => d.status === 'Suspended').length;
+      panfc = 0;
+    } else {
+      tinfc = Math.floor(Math.random() * 5);
+      panfc = Math.floor(Math.random() * 3);
+    }
+    
+    tinfcTotal += tinfc;
+    panfcTotal += panfc;
+    const total = tinfc + panfc;
+    html += `<tr><td><strong>${type}</strong></td><td>${tinfc}</td><td>${panfc}</td><td><strong>${total}</strong></td></tr>`;
+  });
+  
+  html += `<tr style="background:#f0f7ff;font-weight:600;"><td><strong>TOTAL</strong></td><td><strong>${tinfcTotal}</strong></td><td><strong>${panfcTotal}</strong></td><td><strong>${tinfcTotal + panfcTotal}</strong></td></tr>`;
+  document.getElementById('dashTableBody').innerHTML = html;
+}
+
+// ========== DELETE DATA VIEW ==========
+function updateDeleteData() {
+  const allRecords = [];
+  
+  // Collect all data with source info
+  appData.tinfc.forEach(d => allRecords.push({ source: 'TINFC', id: d.branch_code, name: d.person || 'N/A', location: d.location || 'N/A', status: d.status || 'N/A', data: d }));
+  appData.panfc.forEach(d => allRecords.push({ source: 'PANFC', id: d.branch_code, name: d.person || 'N/A', location: d.location || 'N/A', status: d.status || 'N/A', data: d }));
+  appData.subuser.forEach(d => allRecords.push({ source: 'Sub User', id: d.branch_code, name: d.user_name || 'N/A', location: d.location || 'N/A', status: 'N/A', data: d }));
+  appData.conversion.forEach(d => allRecords.push({ source: 'Conversion', id: d.branch_code, name: d.current_person || 'N/A', location: d.location || 'N/A', status: d.status || 'N/A', data: d }));
+  appData.dsc.forEach(d => allRecords.push({ source: 'DSC', id: d.branch_code, name: d.applicant_name || 'N/A', location: d.location || 'N/A', status: 'N/A', data: d }));
+  appData.hodsc.forEach(d => allRecords.push({ source: 'HO DSC', id: d.branch_code, name: d.applicant_name || 'N/A', location: d.location || 'N/A', status: d.status || 'N/A', data: d }));
+  appData.changerequest.forEach(d => allRecords.push({ source: 'Change Request', id: d.branch_code, name: d.branch_code || 'N/A', location: d.location || 'N/A', status: 'N/A', data: d }));
+  appData.useractive.forEach(d => allRecords.push({ source: 'User Active', id: d.branch_code, name: d.branch_code || 'N/A', location: 'N/A', status: d.status || 'N/A', data: d }));
+  
+  window.allRecords = allRecords;
+  renderDeleteData(allRecords);
+}
+
+function renderDeleteData(data) {
+  const tbody = document.getElementById('branch-123');
+  if (!tbody) return;
+  
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#6b7a8a;">No records found</td></tr>';
+    return;
+  }
+
+  let html = '';
+  data.forEach(record => {
+    const statusClass = record.status.toLowerCase() === 'active' ? 'status-active' : 
+                       record.status.toLowerCase() === 'closed' ? 'status-closed' : 
+                       record.status.toLowerCase() === 'suspended' ? 'status-suspended' : '';
+    html += `<tr>
+      <td>${record.source}</td>
+      <td>${record.id}</td>
+      <td>${record.name}</td>
+      <td>${record.location}</td>
+      <td>${record.status !== 'N/A' ? `<span class="${statusClass}">${record.status}</span>` : '-'}</td>
+      <td><button class="btn btn-delete" onclick="deleteFromAll('${record.source}', ${record.id})" style="padding:4px 10px;font-size:12px;"><i class="fas fa-trash"></i> Delete</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function filterDeleteData(search) {
+  if (!search) {
+    renderDeleteData(window.allRecords || []);
+    return;
+  }
+  const filtered = (window.allRecords || []).filter(r => 
+    r.source.toLowerCase().includes(search.toLowerCase()) ||
+    r.name.toLowerCase().includes(search.toLowerCase()) ||
+    r.location.toLowerCase().includes(search.toLowerCase()) ||
+    r.status.toLowerCase().includes(search.toLowerCase()) ||
+    String(r.id).includes(search)
+  );
+  renderDeleteData(filtered);
+}
+
+function deleteFromAll(source, id) {
+  if (!confirm(`Are you sure you want to delete this record from ${source}?`)) return;
+  
+  let dataArray = null;
+  let dataName = '';
+  
+  switch(source) {
+    case 'TINFC': dataArray = appData.tinfc; dataName = 'tinfc'; break;
+    case 'PANFC': dataArray = appData.panfc; dataName = 'panfc'; break;
+    case 'Sub User': dataArray = appData.subuser; dataName = 'subuser'; break;
+    case 'Conversion': dataArray = appData.conversion; dataName = 'conversion'; break;
+    case 'DSC': dataArray = appData.dsc; dataName = 'dsc'; break;
+    case 'HO DSC': dataArray = appData.hodsc; dataName = 'hodsc'; break;
+    case 'Change Request': dataArray = appData.changerequest; dataName = 'changerequest'; break;
+    case 'User Active': dataArray = appData.useractive; dataName = 'useractive'; break;
+    default: return;
+  }
+  
+  const index = dataArray.findIndex(d => d.id === id);
+  if (index !== -1) {
+    dataArray.splice(index, 1);
+    appData.counters[dataName] = dataArray.length;
+    renderAllTables();
+    alert('Record deleted successfully!');
+  }
+}
+
+// ========== FILTER FUNCTIONS ==========
+function filterTable(tableId, search) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = table.querySelectorAll('tbody tr');
+  const searchLower = search.toLowerCase();
+  
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(searchLower) ? '' : 'none';
+  });
+}
+
+function filterByStatus(tableId, status) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = table.querySelectorAll('tbody tr');
+  
+  rows.forEach(row => {
+    if (status === 'all') {
+      row.style.display = '';
+      return;
+    }
+    const statusCell = row.querySelector('td:nth-child(8)');
+    if (statusCell) {
+      const cellText = statusCell.textContent.trim();
+      row.style.display = cellText === status ? '' : 'none';
+    }
+  });
+}
+
+// ========== MODAL FUNCTIONS ==========
+let currentModalType = '';
+let editId = null;
+
+function openModal(type, id = null) {
+  currentModalType = type;
+  editId = id;
+  const modal = document.getElementById('modal');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  
+  let fields = '';
+  let record = null;
+  
+  // Find record if editing
+  if (id) {
+    const dataMap = {
+      'tinfc': appData.tinfc,
+      'panfc': appData.panfc,
+      'subuser': appData.subuser,
+      'conversion': appData.conversion,
+      'dsc': appData.dsc,
+      'hodsc': appData.hodsc,
+      'changerequest': appData.changerequest,
+      'useractive': appData.useractive
+    };
+    const dataArray = dataMap[type];
+    if (dataArray) {
+      record = dataArray.find(d => d.id === id);
+    }
+  }
+  
+  title.textContent = id ? 'Edit Record' : 'Add New Record';
+  
+  // Generate form fields based on type - ALL FIELDS INCLUDED
+  switch(type) {
+    case 'tinfc':
+    case 'panfc':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Branch Code</label><input type="text" id="f_branch_code" value="${record?.branch_code || ''}"></div>
+          <div class="form-group"><label>Zone</label><input type="text" id="f_zone" value="${record?.zone || ''}"></div>
+          <div class="form-group"><label>State</label><input type="text" id="f_state" value="${record?.state || ''}"></div>
+          <div class="form-group"><label>District</label><input type="text" id="f_dist" value="${record?.dist || ''}"></div>
+          <div class="form-group"><label>Region</label><input type="text" id="f_region" value="${record?.region || ''}"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f_location" value="${record?.location || ''}"></div>
+          <div class="form-group"><label>Status</label>
+            <select id="f_status">
+              <option value="Active" ${record?.status === 'Active' ? 'selected' : ''}>Active</option>
+              <option value="Closed" ${record?.status === 'Closed' ? 'selected' : ''}>Closed</option>
+              <option value="Suspended" ${record?.status === 'Suspended' ? 'selected' : ''}>Suspended</option>
+            </select>
+          </div>
+          <div class="form-group"><label>PAN</label><input type="text" id="f_pan" value="${record?.pan || ''}"></div>
+          <div class="form-group"><label>LOC2</label><input type="text" id="f_loc2" value="${record?.loc2 || ''}"></div>
+          <div class="form-group"><label>CAD</label><input type="text" id="f_cad" value="${record?.cad || ''}"></div>
+          <div class="form-group"><label>PAAM Login ID Date</label><input type="text" id="f_paam_login_date" value="${record?.paam_login_date || ''}"></div>
+          <div class="form-group"><label>DSC</label><input type="text" id="f_dsc" value="${record?.dsc || ''}"></div>
+          <div class="form-group"><label>SYSTEM</label><input type="text" id="f_system" value="${record?.system || ''}"></div>
+          <div class="form-group"><label>Person</label><input type="text" id="f_person" value="${record?.person || ''}"></div>
+          <div class="form-group full-width"><label>Address</label><textarea id="f_address" rows="2">${record?.address || ''}</textarea></div>
+          <div class="form-group"><label>Pincode</label><input type="text" id="f_pincode" value="${record?.pincode || ''}"></div>
+          <div class="form-group"><label>STD</label><input type="text" id="f_std" value="${record?.std || ''}"></div>
+          <div class="form-group"><label>Telephone</label><input type="text" id="f_telephone" value="${record?.telephone || ''}"></div>
+          <div class="form-group"><label>TIN Official Mobile</label><input type="text" id="f_mobile" value="${record?.mobile || ''}"></div>
+          <div class="form-group"><label>NSDL OTP Mobile</label><input type="text" id="f_nsdl_otp" value="${record?.nsdl_otp || ''}"></div>
+          <div class="form-group"><label>New Mail</label><input type="email" id="f_new_mail" value="${record?.new_mail || ''}"></div>
+          <div class="form-group"><label>Gmail</label><input type="email" id="f_gmail" value="${record?.gmail || ''}"></div>
+          <div class="form-group"><label>BR Type</label>
+            <select id="f_br_type">
+              <option value="Branch" ${record?.br_type === 'Branch' ? 'selected' : ''}>Branch</option>
+              <option value="Franchisee" ${record?.br_type === 'Franchisee' ? 'selected' : ''}>Franchisee</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Certificate Name</label><input type="text" id="f_cert_name" value="${record?.cert_name || ''}"></div>
+          <div class="form-group"><label>Conversion Dates</label><input type="text" id="f_conversion_dates" value="${record?.conversion_dates || ''}"></div>
+          <div class="form-group"><label>Certificate Valid</label><input type="text" id="f_cert_valid" value="${record?.cert_valid || ''}"></div>
+          <div class="form-group"><label>FR_SRNO</label><input type="text" id="f_fr_srno" value="${record?.fr_srno || ''}"></div>
+          <div class="form-group"><label>FD_WITH_US</label><input type="text" id="f_fd_with_us" value="${record?.fd_with_us || ''}"></div>
+          <div class="form-group"><label>Training Date</label><input type="text" id="f_training_date" value="${record?.training_date || ''}"></div>
+          <div class="form-group"><label>Training Master</label><input type="text" id="f_training_master" value="${record?.training_master || ''}"></div>
+          <div class="form-group full-width"><label>Remark</label><textarea id="f_remark" rows="2">${record?.remark || ''}</textarea></div>
+          <div class="form-group full-width"><label>Others</label><textarea id="f_others" rows="2">${record?.others || ''}</textarea></div>
+          <div class="form-group"><label>NO_TIN_SYS</label><input type="text" id="f_no_tin_sys" value="${record?.no_tin_sys || ''}"></div>
+          <div class="form-group"><label>No of Cancel Mach</label><input type="text" id="f_no_cancel_mach" value="${record?.no_cancel_mach || ''}"></div>
+          <div class="form-group"><label>Cancel Mach Id</label><input type="text" id="f_cancel_mach_id" value="${record?.cancel_mach_id || ''}"></div>
+          <div class="form-group"><label>Branch Closed</label><input type="text" id="f_branch_closed" value="${record?.branch_closed || ''}"></div>
+          <div class="form-group"><label>Backup Received</label><input type="text" id="f_backup_received" value="${record?.backup_received || ''}"></div>
+          <div class="form-group"><label>Pending Issue</label><input type="text" id="f_pending_issue" value="${record?.pending_issue || ''}"></div>
+          <div class="form-group"><label>Closure Request</label><input type="text" id="f_closure_request" value="${record?.closure_request || ''}"></div>
+          <div class="form-group"><label>Withdrawel Form</label><input type="text" id="f_withdrawel_form" value="${record?.withdrawel_form || ''}"></div>
+          <div class="form-group"><label>Closed Letter</label><input type="text" id="f_closed_letter" value="${record?.closed_letter || ''}"></div>
+        </div>
+      `;
+      break;
+      
+    case 'subuser':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Creation Date</label><input type="date" id="f_creation_date" value="${record?.creation_date || ''}"></div>
+          <div class="form-group"><label>Under Br code</label><input type="text" id="f_under_br" value="${record?.under_br || ''}"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f_location" value="${record?.location || ''}"></div>
+          <div class="form-group"><label>User Authorization coordinator</label><input type="text" id="f_auth_coord" value="${record?.auth_coord || ''}"></div>
+          <div class="form-group"><label>Sub User id</label><input type="text" id="f_sub_user_id" value="${record?.sub_user_id || ''}"></div>
+          <div class="form-group"><label>User Name</label><input type="text" id="f_user_name" value="${record?.user_name || ''}"></div>
+          <div class="form-group"><label>User Location</label><input type="text" id="f_user_location" value="${record?.user_location || ''}"></div>
+          <div class="form-group full-width"><label>Address with Pin code</label><textarea id="f_address" rows="2">${record?.address || ''}</textarea></div>
+          <div class="form-group"><label>Contact No</label><input type="text" id="f_contact" value="${record?.contact || ''}"></div>
+          <div class="form-group"><label>Personal Email</label><input type="email" id="f_email" value="${record?.email || ''}"></div>
+        </div>
+      `;
+      break;
+      
+    case 'conversion':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Branch code</label><input type="text" id="f_branch_code" value="${record?.branch_code || ''}"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f_location" value="${record?.location || ''}"></div>
+          <div class="form-group"><label>Status</label>
+            <select id="f_status">
+              <option value="Active" ${record?.status === 'Active' ? 'selected' : ''}>Active</option>
+              <option value="Closed" ${record?.status === 'Closed' ? 'selected' : ''}>Closed</option>
+              <option value="Suspended" ${record?.status === 'Suspended' ? 'selected' : ''}>Suspended</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Current Person Name</label><input type="text" id="f_current_person" value="${record?.current_person || ''}"></div>
+          <div class="form-group"><label>Previous Person Name</label><input type="text" id="f_prev_person" value="${record?.prev_person || ''}"></div>
+          <div class="form-group"><label>Reference Name</label><input type="text" id="f_ref_name" value="${record?.ref_name || ''}"></div>
+          <div class="form-group"><label>Documents Status</label><input type="text" id="f_doc_status" value="${record?.doc_status || ''}"></div>
+          <div class="form-group"><label>Status 2</label><input type="text" id="f_status2" value="${record?.status2 || ''}"></div>
+          <div class="form-group full-width"><label>Remarks</label><textarea id="f_remarks" rows="2">${record?.remarks || ''}</textarea></div>
+        </div>
+      `;
+      break;
+      
+    case 'dsc':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Application Mode</label><input type="text" id="f_app_mode" value="${record?.app_mode || ''}"></div>
+          <div class="form-group"><label>Branch Code</label><input type="text" id="f_branch_code" value="${record?.branch_code || ''}"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f_location" value="${record?.location || ''}"></div>
+          <div class="form-group"><label>User ID</label><input type="text" id="f_user_id" value="${record?.user_id || ''}"></div>
+          <div class="form-group"><label>Application No</label><input type="text" id="f_app_no" value="${record?.app_no || ''}"></div>
+          <div class="form-group"><label>Desired Username</label><input type="text" id="f_desired_username" value="${record?.desired_username || ''}"></div>
+          <div class="form-group"><label>Desired PIN</label><input type="text" id="f_desired_pin" value="${record?.desired_pin || ''}"></div>
+          <div class="form-group"><label>Aadhaar No</label><input type="text" id="f_aadhaar" value="${record?.aadhaar || ''}"></div>
+          <div class="form-group"><label>Challenge Code</label><input type="text" id="f_challenge_code" value="${record?.challenge_code || ''}"></div>
+          <div class="form-group"><label>Password (DOB)</label><input type="text" id="f_password" value="${record?.password || ''}"></div>
+          <div class="form-group"><label>Serial No</label><input type="text" id="f_serial_no" value="${record?.serial_no || ''}"></div>
+          <div class="form-group"><label>SUBMISSION TO RO</label><input type="text" id="f_submission_ro" value="${record?.submission_ro || ''}"></div>
+          <div class="form-group"><label>Applicant Name</label><input type="text" id="f_applicant_name" value="${record?.applicant_name || ''}"></div>
+          <div class="form-group"><label>Old DSC Expiry</label><input type="date" id="f_old_dsc_expiry" value="${record?.old_dsc_expiry || ''}"></div>
+          <div class="form-group"><label>New DSC Expiry</label><input type="date" id="f_new_dsc_expiry" value="${record?.new_dsc_expiry || ''}"></div>
+          <div class="form-group"><label>Email ID</label><input type="email" id="f_email" value="${record?.email || ''}"></div>
+          <div class="form-group"><label>Courier Details</label><input type="text" id="f_courier_details" value="${record?.courier_details || ''}"></div>
+          <div class="form-group"><label>Confirmation</label><input type="text" id="f_confirmation" value="${record?.confirmation || ''}"></div>
+        </div>
+      `;
+      break;
+      
+    case 'hodsc':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Status</label>
+            <select id="f_status">
+              <option value="Active" ${record?.status === 'Active' ? 'selected' : ''}>Active</option>
+              <option value="Pending" ${record?.status === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option value="Closed" ${record?.status === 'Closed' ? 'selected' : ''}>Closed</option>
+            </select>
+          </div>
+          <div class="form-group"><label>CODE</label><input type="text" id="f_code" value="${record?.code || ''}"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f_location" value="${record?.location || ''}"></div>
+          <div class="form-group"><label>User IDs</label><input type="text" id="f_user_ids" value="${record?.user_ids || ''}"></div>
+          <div class="form-group"><label>Application No</label><input type="text" id="f_app_no" value="${record?.app_no || ''}"></div>
+          <div class="form-group"><label>Challenge Code</label><input type="text" id="f_challenge_code" value="${record?.challenge_code || ''}"></div>
+          <div class="form-group"><label>Password (DOB)</label><input type="text" id="f_password" value="${record?.password || ''}"></div>
+          <div class="form-group"><label>Serial No</label><input type="text" id="f_serial_no" value="${record?.serial_no || ''}"></div>
+          <div class="form-group"><label>KYC PAN no</label><input type="text" id="f_kyc_pan" value="${record?.kyc_pan || ''}"></div>
+          <div class="form-group"><label>SUBMISSION TO RO</label><input type="text" id="f_submission_ro" value="${record?.submission_ro || ''}"></div>
+          <div class="form-group"><label>Applicant Name</label><input type="text" id="f_applicant_name" value="${record?.applicant_name || ''}"></div>
+          <div class="form-group"><label>Old DSC Expiry</label><input type="date" id="f_old_dsc_expiry" value="${record?.old_dsc_expiry || ''}"></div>
+          <div class="form-group"><label>New DSC Expiry</label><input type="date" id="f_new_dsc_expiry" value="${record?.new_dsc_expiry || ''}"></div>
+          <div class="form-group"><label>Email ID</label><input type="email" id="f_email" value="${record?.email || ''}"></div>
+          <div class="form-group"><label>Confirmation</label><input type="text" id="f_confirmation" value="${record?.confirmation || ''}"></div>
+        </div>
+      `;
+      break;
+      
+    case 'changerequest':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Letter No</label><input type="text" id="f_letter_no" value="${record?.letter_no || ''}"></div>
+          <div class="form-group"><label>Mail sent to NSDL date</label><input type="date" id="f_mail_date" value="${record?.mail_date || ''}"></div>
+          <div class="form-group"><label>NSDL confirmation date</label><input type="date" id="f_nsdl_date" value="${record?.nsdl_date || ''}"></div>
+          <div class="form-group full-width"><label>Modification details</label><textarea id="f_mod_details" rows="2">${record?.mod_details || ''}</textarea></div>
+          <div class="form-group"><label>Branch code</label><input type="text" id="f_branch_code" value="${record?.branch_code || ''}"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="f_location" value="${record?.location || ''}"></div>
+          <div class="form-group"><label>State</label><input type="text" id="f_state" value="${record?.state || ''}"></div>
+          <div class="form-group"><label>District</label><input type="text" id="f_dist" value="${record?.dist || ''}"></div>
+          <div class="form-group"><label>Old Name</label><input type="text" id="f_old_name" value="${record?.old_name || ''}"></div>
+          <div class="form-group"><label>New Name</label><input type="text" id="f_new_name" value="${record?.new_name || ''}"></div>
+          <div class="form-group full-width"><label>Old Address</label><textarea id="f_old_address" rows="2">${record?.old_address || ''}</textarea></div>
+          <div class="form-group full-width"><label>New Address</label><textarea id="f_new_address" rows="2">${record?.new_address || ''}</textarea></div>
+          <div class="form-group"><label>Old Pincode</label><input type="text" id="f_old_pincode" value="${record?.old_pincode || ''}"></div>
+          <div class="form-group"><label>New Pincode</label><input type="text" id="f_new_pincode" value="${record?.new_pincode || ''}"></div>
+          <div class="form-group"><label>Old Contact</label><input type="text" id="f_old_contact" value="${record?.old_contact || ''}"></div>
+          <div class="form-group"><label>New Contact</label><input type="text" id="f_new_contact" value="${record?.new_contact || ''}"></div>
+          <div class="form-group"><label>Old Email</label><input type="email" id="f_old_email" value="${record?.old_email || ''}"></div>
+          <div class="form-group"><label>New Email</label><input type="email" id="f_new_email" value="${record?.new_email || ''}"></div>
+          <div class="form-group"><label>BR Type</label><input type="text" id="f_br_type" value="${record?.br_type || ''}"></div>
+        </div>
+      `;
+      break;
+      
+    case 'useractive':
+      fields = `
+        <div class="form-grid">
+          <div class="form-group"><label>Branch Code</label><input type="text" id="f_branch_code" value="${record?.branch_code || ''}"></div>
+          <div class="form-group"><label>Status</label>
+            <select id="f_status">
+              <option value="Active" ${record?.status === 'Active' ? 'selected' : ''}>Active</option>
+              <option value="Deactive" ${record?.status === 'Deactive' ? 'selected' : ''}>Deactive</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Deactivate Date</label><input type="date" id="f_deactivate_date" value="${record?.deactivate_date || ''}"></div>
+          <div class="form-group"><label>Name of Confirmation</label><input type="text" id="f_confirmation" value="${record?.confirmation || ''}"></div>
+          <div class="form-group full-width"><label>Deactivation Reason</label><textarea id="f_deactivation_reason" rows="2">${record?.deactivation_reason || ''}</textarea></div>
+          <div class="form-group"><label>Activation date</label><input type="date" id="f_activation_date" value="${record?.activation_date || ''}"></div>
+        </div>
+      `;
+      break;
+      
+    default:
+      fields = '<p>No fields defined for this section.</p>';
+  }
+  
+  body.innerHTML = fields;
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  currentModalType = '';
+  editId = null;
+}
+
+function saveRecord() {
+  const type = currentModalType;
+  const id = editId;
+  
+  // Get form values based on type
+  const getValue = (id) => document.getElementById(id)?.value || '';
+  
+  let record = {};
+  
+  switch(type) {
+    case 'tinfc':
+    case 'panfc':
+      record = {
+        branch_code: getValue('f_branch_code'),
+        zone: getValue('f_zone'),
+        state: getValue('f_state'),
+        dist: getValue('f_dist'),
+        region: getValue('f_region'),
+        location: getValue('f_location'),
+        status: getValue('f_status'),
+        pan: getValue('f_pan'),
+        loc2: getValue('f_loc2'),
+        cad: getValue('f_cad'),
+        paam_login_date: getValue('f_paam_login_date'),
+        dsc: getValue('f_dsc'),
+        system: getValue('f_system'),
+        person: getValue('f_person'),
+        address: getValue('f_address'),
+        pincode: getValue('f_pincode'),
+        std: getValue('f_std'),
+        telephone: getValue('f_telephone'),
+        mobile: getValue('f_mobile'),
+        nsdl_otp: getValue('f_nsdl_otp'),
+        new_mail: getValue('f_new_mail'),
+        gmail: getValue('f_gmail'),
+        br_type: getValue('f_br_type'),
+        cert_name: getValue('f_cert_name'),
+        conversion_dates: getValue('f_conversion_dates'),
+        cert_valid: getValue('f_cert_valid'),
+        fr_srno: getValue('f_fr_srno'),
+        fd_with_us: getValue('f_fd_with_us'),
+        training_date: getValue('f_training_date'),
+        training_master: getValue('f_training_master'),
+        remark: getValue('f_remark'),
+        others: getValue('f_others'),
+        no_tin_sys: getValue('f_no_tin_sys'),
+        no_cancel_mach: getValue('f_no_cancel_mach'),
+        cancel_mach_id: getValue('f_cancel_mach_id'),
+        branch_closed: getValue('f_branch_closed'),
+        backup_received: getValue('f_backup_received'),
+        pending_issue: getValue('f_pending_issue'),
+        closure_request: getValue('f_closure_request'),
+        withdrawel_form: getValue('f_withdrawel_form'),
+        closed_letter: getValue('f_closed_letter')
+      };
+      break;
+      
+    case 'subuser':
+      record = {
+        creation_date: getValue('f_creation_date'),
+        under_br: getValue('f_under_br'),
+        location: getValue('f_location'),
+        auth_coord: getValue('f_auth_coord'),
+        sub_user_id: getValue('f_sub_user_id'),
+        user_name: getValue('f_user_name'),
+        user_location: getValue('f_user_location'),
+        address: getValue('f_address'),
+        contact: getValue('f_contact'),
+        email: getValue('f_email')
+      };
+      break;
+      
+    case 'conversion':
+      record = {
+        branch_code: getValue('f_branch_code'),
+        location: getValue('f_location'),
+        status: getValue('f_status'),
+        current_person: getValue('f_current_person'),
+        prev_person: getValue('f_prev_person'),
+        ref_name: getValue('f_ref_name'),
+        doc_status: getValue('f_doc_status'),
+        status2: getValue('f_status2'),
+        remarks: getValue('f_remarks')
+      };
+      break;
+      
+    case 'dsc':
+      record = {
+        app_mode: getValue('f_app_mode'),
+        branch_code: getValue('f_branch_code'),
+        location: getValue('f_location'),
+        user_id: getValue('f_user_id'),
+        app_no: getValue('f_app_no'),
+        desired_username: getValue('f_desired_username'),
+        desired_pin: getValue('f_desired_pin'),
+        aadhaar: getValue('f_aadhaar'),
+        challenge_code: getValue('f_challenge_code'),
+        password: getValue('f_password'),
+        serial_no: getValue('f_serial_no'),
+        submission_ro: getValue('f_submission_ro'),
+        applicant_name: getValue('f_applicant_name'),
+        old_dsc_expiry: getValue('f_old_dsc_expiry'),
+        new_dsc_expiry: getValue('f_new_dsc_expiry'),
+        email: getValue('f_email'),
+        courier_details: getValue('f_courier_details'),
+        confirmation: getValue('f_confirmation')
+      };
+      break;
+      
+    case 'hodsc':
+      record = {
+        status: getValue('f_status'),
+        code: getValue('f_code'),
+        location: getValue('f_location'),
+        user_ids: getValue('f_user_ids'),
+        app_no: getValue('f_app_no'),
+        challenge_code: getValue('f_challenge_code'),
+        password: getValue('f_password'),
+        serial_no: getValue('f_serial_no'),
+        kyc_pan: getValue('f_kyc_pan'),
+        submission_ro: getValue('f_submission_ro'),
+        applicant_name: getValue('f_applicant_name'),
+        old_dsc_expiry: getValue('f_old_dsc_expiry'),
+        new_dsc_expiry: getValue('f_new_dsc_expiry'),
+        email: getValue('f_email'),
+        confirmation: getValue('f_confirmation')
+      };
+      break;
+      
+    case 'changerequest':
+      record = {
+        letter_no: getValue('f_letter_no'),
+        mail_date: getValue('f_mail_date'),
+        nsdl_date: getValue('f_nsdl_date'),
+        mod_details: getValue('f_mod_details'),
+        branch_code: getValue('f_branch_code'),
+        location: getValue('f_location'),
+        state: getValue('f_state'),
+        dist: getValue('f_dist'),
+        old_name: getValue('f_old_name'),
+        new_name: getValue('f_new_name'),
+        old_address: getValue('f_old_address'),
+        new_address: getValue('f_new_address'),
+        old_pincode: getValue('f_old_pincode'),
+        new_pincode: getValue('f_new_pincode'),
+        old_contact: getValue('f_old_contact'),
+        new_contact: getValue('f_new_contact'),
+        old_email: getValue('f_old_email'),
+        new_email: getValue('f_new_email'),
+        br_type: getValue('f_br_type')
+      };
+      break;
+      
+    case 'useractive':
+      record = {
+        branch_code: getValue('f_branch_code'),
+        status: getValue('f_status'),
+        deactivate_date: getValue('f_deactivate_date'),
+        confirmation: getValue('f_confirmation'),
+        deactivation_reason: getValue('f_deactivation_reason'),
+        activation_date: getValue('f_activation_date')
+      };
+      break;
+  }
+  
+  // Save or update
+  const dataMap = {
+    'tinfc': appData.tinfc,
+    'panfc': appData.panfc,
+    'subuser': appData.subuser,
+    'conversion': appData.conversion,
+    'dsc': appData.dsc,
+    'hodsc': appData.hodsc,
+    'changerequest': appData.changerequest,
+    'useractive': appData.useractive
+  };
+  
+  const dataArray = dataMap[type];
+  if (!dataArray) return;
+  
+  if (id) {
+    // Edit existing
+    const index = dataArray.findIndex(d => d.id === id);
+    if (index !== -1) {
+      // Preserve existing fields not in form
+      const existing = dataArray[index];
+      dataArray[index] = { ...existing, ...record };
+      alert('Record updated successfully!');
+    }
+  } else {
+    // Add new
+    const newId = Math.max(0, ...dataArray.map(d => d.id)) + 1;
+    record.id = newId;
+    record.sno = dataArray.length + 1;
+    dataArray.push(record);
+    appData.counters[type] = dataArray.length;
+    alert('Record added successfully!');
+  }
+  
+  closeModal();
+  renderAllTables();
+}
+
+function editRecord(tableId, id) {
+  const typeMap = {
+    'tinfc': 'tinfc',
+    'panfc': 'panfc',
+    'subuser': 'subuser',
+    'conversion': 'conversion',
+    'dsc': 'dsc',
+    'hoDsc': 'hodsc',
+    'changeRequest': 'changerequest',
+    'userActive': 'useractive'
+  };
+  const type = typeMap[tableId];
+  if (type) {
+    openModal(type, id);
+  }
+}
+
+// ========== CHANGE PASSWORD FUNCTIONS ==========
+function openChangePassword() {
+  document.getElementById('changePasswordModal').classList.add('active');
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+  // Reset validation
+  document.querySelectorAll('#passwordRequirements li').forEach(el => {
+    el.className = 'invalid';
+    el.innerHTML = el.innerHTML.replace('fa-check', 'fa-times');
+  });
+  document.getElementById('changePasswordBtn').disabled = true;
+}
+
+function closeChangePassword() {
+  document.getElementById('changePasswordModal').classList.remove('active');
+}
+
+function validatePassword() {
+  const newPass = document.getElementById('newPassword').value;
+  const confirmPass = document.getElementById('confirmPassword').value;
+  
+  const requirements = [
+    { id: 'reqLength', test: newPass.length >= 8, msg: 'At least 8 characters' },
+    { id: 'reqUppercase', test: /[A-Z]/.test(newPass), msg: 'At least one uppercase letter' },
+    { id: 'reqLowercase', test: /[a-z]/.test(newPass), msg: 'At least one lowercase letter' },
+    { id: 'reqNumber', test: /[0-9]/.test(newPass), msg: 'At least one number' },
+    { id: 'reqMatch', test: newPass === confirmPass && newPass.length > 0, msg: 'Passwords match' }
+  ];
+  
+  let allValid = true;
+  
+  requirements.forEach(req => {
+    const el = document.getElementById(req.id);
+    if (req.test) {
+      el.className = 'valid';
+      el.innerHTML = `<i class="fas fa-check"></i> ${req.msg}`;
+    } else {
+      el.className = 'invalid';
+      el.innerHTML = `<i class="fas fa-times"></i> ${req.msg}`;
+      allValid = false;
+    }
+  });
+  
+  document.getElementById('changePasswordBtn').disabled = !allValid;
+}
+
+function changePassword() {
+  const currentPass = document.getElementById('currentPassword').value;
+  const newPass = document.getElementById('newPassword').value;
+  const confirmPass = document.getElementById('confirmPassword').value;
+  
+  if (!currentPass) {
+    alert('Please enter your current password');
+    return;
+  }
+  
+  if (newPass !== confirmPass) {
+    alert('Passwords do not match');
+    return;
+  }
+  
+  if (newPass.length < 8 || !/[A-Z]/.test(newPass) || !/[a-z]/.test(newPass) || !/[0-9]/.test(newPass)) {
+    alert('Please ensure your password meets all requirements');
+    return;
+  }
+  
+  alert('Password changed successfully!');
+  closeChangePassword();
+}
+
+// ========== SECTION SWITCHING ==========
+function showSection(section) {
+  document.querySelectorAll('.content-section').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  const target = document.getElementById('section-' + section);
+  if (target) {
+    target.classList.add('active');
+  }
+  
+  document.querySelectorAll('.navbar a, .dropdown-content a').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  const clickedLink = document.querySelector(`[onclick*="showSection('${section}')"]`);
+  if (clickedLink) {
+    clickedLink.classList.add('active');
+  }
+  
+  if (section === 'dashboard') {
+    updateDashboard();
+  }
+}
+
+// ========== LOGIN / LOGOUT ==========
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  if (email && password) {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('portal').style.display = 'block';
+    initSampleData();
+    renderAllTables();
+  } else {
+    alert('Please enter email and password');
+  }
+}
+
+function handleLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('portal').style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Auto-login for demo - uncomment to enable
+  // handleLogin();
+});
+</script>
+
+</body>
+</html>
